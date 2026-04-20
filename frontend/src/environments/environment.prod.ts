@@ -1,5 +1,4 @@
 export const environment = {
   production: true,
-  // Auto-detect: use relative path so it works on any domain
-  apiUrl: '/api',
+  apiUrl: 'https://supermarket-app-c1su.onrender.com/api',
 };
