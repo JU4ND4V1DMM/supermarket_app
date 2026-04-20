@@ -1,0 +1,38 @@
+# ── Python / Backend ──
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+.env
+*.db
+*.sqlite3
+venv/
+.venv/
+env/
+
+# ── Node / Frontend ──
+node_modules/
+dist/
+.angular/
+*.js.map
+
+# ── IDE ──
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── Secrets ──
+*.pem
+*.key
+.env.local
+.env.production

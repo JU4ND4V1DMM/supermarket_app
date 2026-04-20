@@ -1,0 +1,54 @@
+import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
+
+export const routes: Routes = [
+  {
+    path: 'auth',
+    canActivate: [guestGuard],
+    loadChildren: () =>
+      import('./modules/auth/auth.routes').then((m) => m.authRoutes),
+  },
+  {
+    path: '',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./layouts/main-layout/main-layout.component').then(
+        (m) => m.MainLayoutComponent
+      ),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./modules/dashboard/dashboard.component').then(
+            (m) => m.DashboardComponent
+          ),
+      },
+      {
+        path: 'suppliers',
+        loadChildren: () =>
+          import('./modules/suppliers/suppliers.routes').then(
+            (m) => m.suppliersRoutes
+          ),
+      },
+      {
+        path: 'foods',
+        loadChildren: () =>
+          import('./modules/foods/foods.routes').then((m) => m.foodsRoutes),
+      },
+      {
+        path: 'transactions',
+        loadChildren: () =>
+          import('./modules/transactions/transactions.routes').then(
+            (m) => m.transactionsRoutes
+          ),
+      },
+    ],
+  },
+  { path: '**', redirectTo: '' },
+];
