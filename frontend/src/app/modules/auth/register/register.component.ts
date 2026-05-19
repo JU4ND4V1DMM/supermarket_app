@@ -20,7 +20,7 @@ import { Router } from '@angular/router';
             style="background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 8px 32px rgba(16,185,129,0.35)">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           </div>
-          <h1 class="text-3xl font-extrabold text-white tracking-tight">Crear cuenta</h1>
+          <h1 class="text-3xl font-extrabold text-indigo-600 tracking-tight">Crear cuenta</h1>
           <p class="mt-2 text-sm" style="color:var(--text-2)">Únete a Legumbría La Bendición y gestiona tu supermercado</p>
         </div>
 

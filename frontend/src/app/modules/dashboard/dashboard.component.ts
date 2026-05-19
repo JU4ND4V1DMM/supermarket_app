@@ -1,210 +1,634 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DashboardService, DashboardStats } from '../../core/services/dashboard.service';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner.component';
 
+import {
+  LucideAngularModule,
+  Truck,
+  Package,
+  ReceiptText,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  Activity,
+  ShoppingCart,
+  ArrowUpRight,
+  ArrowDownRight,
+  Clock3
+} from 'lucide-angular';
+
+const COP = (n: number) =>
+  new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0
+  }).format(n);
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, SpinnerComponent, CurrencyPipe, DatePipe, DecimalPipe],
+  imports: [
+    CommonModule,
+    RouterLink,
+    SpinnerComponent,
+    DatePipe,
+    LucideAngularModule
+  ],
   template: `
-    <div style="color:var(--text-1)">
+    <div>
 
-      <!-- Header -->
-      <div class="mb-7 animate-fade-up">
-        <div class="flex items-center gap-2 mb-1">
-          <div class="w-1.5 h-6 rounded-full" style="background:linear-gradient(180deg,#0ea5e9,#6366f1)"></div>
-          <h1 class="text-2xl font-extrabold tracking-tight" style="color:var(--text-1)">Panel Principal</h1>
+      <!-- HEADER -->
+      <div class="mb-8 animate-fade-up">
+
+        <div class="flex items-center gap-3 mb-2">
+
+          <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg"
+            style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">
+
+            <lucide-icon [img]="Activity"
+              class="w-5 h-5 text-white">
+            </lucide-icon>
+
+          </div>
+
+          <div>
+
+            <h1 class="text-2xl font-extrabold tracking-tight"
+              style="color:var(--text-1)">
+
+              Panel Principal
+
+            </h1>
+
+            <p class="text-sm"
+              style="color:var(--text-4)">
+
+              Vista general de operaciones — Legumbría La Bendición
+
+            </p>
+
+          </div>
+
         </div>
-        <p class="ml-3.5 text-sm" style="color:var(--text-3)">Vista general de las operaciones del supermercado</p>
+
       </div>
 
       @if (loading()) {
+
         <app-spinner />
+
       } @else if (stats()) {
 
-        <!-- ── Stat Cards ── -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-7">
-          @for (card of statCards(); track card.label; let i = $index) {
-            <div class="animate-fade-up relative overflow-hidden rounded-2xl p-5 cursor-default group transition-all duration-300 hover:-translate-y-1"
+        <!-- STATS -->
+        <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+
+          @for (c of statCards(); track c.label; let i = $index) {
+
+            <div
+              class="animate-fade-up relative overflow-hidden rounded-3xl p-5 group hover:-translate-y-1 transition-all duration-300"
               [class]="'stagger-' + (i+1)"
-              style="background:var(--surface-2);border:1.5px solid var(--border);box-shadow:var(--shadow-sm)">
+              style="background:#fff;border:1.5px solid var(--border);box-shadow:var(--shadow-sm)">
 
-              <!-- Hover glow -->
-              <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"
-                [style]="'background:radial-gradient(circle at 50% 0%,' + card.glow + ' 0%,transparent 70%)'"></div>
-
-              <!-- Top decoration line -->
-              <div class="absolute top-0 left-0 right-0 h-0.5 rounded-t-2xl opacity-60"
-                [style]="'background:' + card.iconColor"></div>
+              <div
+                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300"
+                [style]="'background:' + c.glow">
+              </div>
 
               <div class="relative z-10">
-                <div class="flex items-start justify-between mb-4">
-                  <div class="w-11 h-11 rounded-xl flex items-center justify-center"
-                    [style]="'background:' + card.iconBg">
-                    <span [innerHTML]="card.icon" [style]="'color:' + card.iconColor" class="w-5 h-5 block"></span>
+
+                <div class="flex items-start justify-between mb-5">
+
+                  <div class="w-12 h-12 rounded-2xl flex items-center justify-center"
+                    [style]="'background:' + c.bg">
+
+                    @if (c.icon === 'truck') {
+                      <lucide-icon [img]="Truck"
+                        class="w-5 h-5"
+                        [style]="'color:' + c.color">
+                      </lucide-icon>
+                    }
+
+                    @if (c.icon === 'package') {
+                      <lucide-icon [img]="Package"
+                        class="w-5 h-5"
+                        [style]="'color:' + c.color">
+                      </lucide-icon>
+                    }
+
+                    @if (c.icon === 'receipt') {
+                      <lucide-icon [img]="ReceiptText"
+                        class="w-5 h-5"
+                        [style]="'color:' + c.color">
+                      </lucide-icon>
+                    }
+
+                    @if (c.icon === 'dollar') {
+                      <lucide-icon [img]="DollarSign"
+                        class="w-5 h-5"
+                        [style]="'color:' + c.color">
+                      </lucide-icon>
+                    }
+
                   </div>
-                  <span class="text-xs px-2 py-0.5 rounded-full font-medium"
-                    style="background:var(--surface-3);color:var(--text-3)">Total</span>
+
+                  <span
+                    class="text-[11px] font-bold px-2 py-1 rounded-full"
+                    style="background:var(--surface-3);color:var(--text-4)">
+
+                    GENERAL
+
+                  </span>
+
                 </div>
-                <p class="text-3xl font-black stat-number mb-1" style="color:var(--text-1)">{{ card.value }}</p>
-                <p class="text-sm font-medium" style="color:var(--text-2)">{{ card.label }}</p>
+
+                <p class="text-2xl font-black mb-1 stat-number"
+                  style="color:var(--text-1)">
+
+                  {{ c.value }}
+
+                </p>
+
+                <p class="text-xs font-semibold"
+                  style="color:var(--text-4)">
+
+                  {{ c.label }}
+
+                </p>
+
               </div>
+
             </div>
+
           }
+
         </div>
 
+        <!-- PROFITS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+          <div class="rounded-3xl p-5"
+            style="background:rgba(16,185,129,.06);border:1.5px solid rgba(16,185,129,.15)">
+
+            <div class="flex items-center gap-3">
+
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                style="background:rgba(16,185,129,.12)">
+
+                <lucide-icon [img]="TrendingUp"
+                  class="w-5 h-5 text-emerald-600">
+                </lucide-icon>
+
+              </div>
+
+              <div>
+
+                <p class="text-xs font-bold uppercase tracking-widest text-emerald-600">
+                  Ventas Totales
+                </p>
+
+                <p class="text-xl font-black text-emerald-600">
+                  {{ cop(stats()!.total_sales) }}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="rounded-3xl p-5"
+            style="background:rgba(99,102,241,.06);border:1.5px solid rgba(99,102,241,.15)">
+
+            <div class="flex items-center gap-3">
+
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                style="background:rgba(99,102,241,.12)">
+
+                <lucide-icon [img]="ShoppingCart"
+                  class="w-5 h-5 text-indigo-500">
+                </lucide-icon>
+
+              </div>
+
+              <div>
+
+                <p class="text-xs font-bold uppercase tracking-widest text-indigo-500">
+                  Compras Totales
+                </p>
+
+                <p class="text-xl font-black text-indigo-500">
+                  {{ cop(stats()!.total_purchases) }}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="rounded-3xl p-5"
+            [style]="stats()!.total_profit >= 0
+              ? 'background:rgba(16,185,129,.06);border:1.5px solid rgba(16,185,129,.15)'
+              : 'background:rgba(244,63,94,.06);border:1.5px solid rgba(244,63,94,.15)'">
+
+            <div class="flex items-center gap-3">
+
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                [style]="stats()!.total_profit >= 0
+                  ? 'background:rgba(16,185,129,.12)'
+                  : 'background:rgba(244,63,94,.12)'">
+
+                @if (stats()!.total_profit >= 0) {
+
+                  <lucide-icon [img]="ArrowUpRight"
+                    class="w-5 h-5 text-emerald-600">
+                  </lucide-icon>
+
+                } @else {
+
+                  <lucide-icon [img]="ArrowDownRight"
+                    class="w-5 h-5 text-rose-600">
+                  </lucide-icon>
+
+                }
+
+              </div>
+
+              <div>
+
+                <p
+                  class="text-xs font-bold uppercase tracking-widest"
+                  [style]="stats()!.total_profit >= 0 ? 'color:#059669' : 'color:#e11d48'">
+
+                  {{ stats()!.total_profit >= 0 ? 'Ganancia Neta' : 'Pérdida' }}
+
+                </p>
+
+                <p
+                  class="text-xl font-black"
+                  [style]="stats()!.total_profit >= 0 ? 'color:#059669' : 'color:#e11d48'">
+
+                  {{ cop(stats()!.total_profit) }}
+
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- CONTENT -->
         <div class="grid grid-cols-1 xl:grid-cols-5 gap-5">
 
-          <!-- ── Top productos ── -->
-          <div class="xl:col-span-3 animate-fade-up stagger-3 rounded-2xl p-6"
-            style="background:var(--surface-2);border:1.5px solid var(--border);box-shadow:var(--shadow-sm)">
+          <!-- TOP PRODUCTS -->
+          <div class="xl:col-span-3 rounded-3xl p-6 animate-fade-up"
+            style="background:#fff;border:1.5px solid var(--border);box-shadow:var(--shadow-sm)">
 
-            <div class="flex items-center justify-between mb-5">
-              <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.2)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:#059669" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <div class="flex items-center justify-between mb-6">
+
+              <div class="flex items-center gap-3">
+
+                <div class="w-10 h-10 rounded-2xl flex items-center justify-center"
+                  style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.15)">
+
+                  <lucide-icon [img]="TrendingUp"
+                    class="w-5 h-5 text-emerald-600">
+                  </lucide-icon>
+
                 </div>
-                <h2 class="font-bold text-sm" style="color:var(--text-1)">Productos más vendidos</h2>
+
+                <div>
+
+                  <h2 class="text-sm font-bold"
+                    style="color:var(--text-1)">
+
+                    Productos más vendidos
+
+                  </h2>
+
+                  <p class="text-xs"
+                    style="color:var(--text-4)">
+
+                    Ranking de productos con más movimiento
+
+                  </p>
+
+                </div>
+
               </div>
+
               <a routerLink="/transactions"
-                class="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer"
-                style="color:var(--accent);background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.15)"
-                onmouseenter="this.style.background='rgba(14,165,233,0.14)'"
-                onmouseleave="this.style.background='rgba(14,165,233,0.08)'">Ver todo →</a>
+                class="text-xs font-semibold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5"
+                style="background:rgba(99,102,241,.08);color:#6366f1">
+
+                Ver todo
+
+                <lucide-icon [img]="ArrowUpRight"
+                  class="w-3.5 h-3.5">
+                </lucide-icon>
+
+              </a>
+
             </div>
 
-            @if (stats()!.food_stats.length === 0) {
-              <div class="flex flex-col items-center justify-center py-12 text-center">
-                <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 animate-float"
-                  style="background:var(--surface-3);border:1.5px solid var(--border)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" style="color:var(--text-4)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                </div>
-                <p class="text-sm font-semibold" style="color:var(--text-2)">Sin datos aún</p>
-                <p class="text-xs mt-1" style="color:var(--text-3)">Registra transacciones para ver estadísticas</p>
+            @if (!stats()!.food_stats.length) {
+
+              <div class="flex flex-col items-center justify-center py-14">
+
+                <lucide-icon [img]="Package"
+                  class="w-10 h-10 opacity-30 mb-3">
+                </lucide-icon>
+
+                <p class="text-sm font-semibold"
+                  style="color:var(--text-4)">
+
+                  Sin datos aún
+
+                </p>
+
               </div>
+
+            } @else {
+
+              <div class="space-y-4">
+
+                @for (item of stats()!.food_stats.slice(0,6); track item.name; let i = $index) {
+
+                  <div class="flex items-center gap-4">
+
+                    <div
+                      class="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black flex-shrink-0"
+                      style="background:rgba(99,102,241,.1);color:#6366f1">
+
+                      {{ i + 1 }}
+
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+
+                      <div class="flex justify-between items-center mb-1.5">
+
+                        <span class="text-sm font-semibold truncate"
+                          style="color:var(--text-1)">
+
+                          {{ item.name }}
+
+                        </span>
+
+                        <span class="text-xs font-bold text-emerald-600">
+
+                          {{ item.count }} uds
+
+                        </span>
+
+                      </div>
+
+                      <div class="h-2 rounded-full overflow-hidden"
+                        style="background:var(--surface-3)">
+
+                        <div
+                          class="h-full rounded-full transition-all duration-700"
+                          style="background:linear-gradient(90deg,#6366f1,#10b981)"
+                          [style.width.%]="barWidth(item.count)">
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <span class="text-xs font-black"
+                      style="color:var(--text-4)">
+
+                      {{ cop(item.revenue) }}
+
+                    </span>
+
+                  </div>
+
+                }
+
+              </div>
+
             }
 
-            <div class="space-y-3.5">
-              @for (item of stats()!.food_stats.slice(0, 6); track item.name; let i = $index) {
-                <div class="flex items-center gap-3">
-                  <!-- Rank badge -->
-                  <div class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-black"
-                    style="background:rgba(14,165,233,0.10);color:var(--accent)">{{ i + 1 }}</div>
-
-                  <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-sm font-semibold truncate" style="color:var(--text-1)">{{ item.name }}</span>
-                      <span class="text-xs font-bold ml-2 flex-shrink-0" style="color:#059669">{{ item.count }} ventas</span>
-                    </div>
-                    <div class="h-1.5 rounded-full overflow-hidden" style="background:var(--surface-3)">
-                      <div class="h-full rounded-full transition-all duration-700"
-                        style="background:linear-gradient(90deg,#0ea5e9,#10b981)"
-                        [style.width.%]="barWidth(item.count)"></div>
-                    </div>
-                  </div>
-                  <span class="text-xs font-mono flex-shrink-0 font-semibold" style="color:var(--text-3)">
-                    {{ item.revenue | currency:'COP':'symbol-narrow':'1.0-0' }}
-                  </span>
-                </div>
-              }
-            </div>
           </div>
 
-          <!-- ── Actividad reciente ── -->
-          <div class="xl:col-span-2 animate-fade-up stagger-4 rounded-2xl p-6"
-            style="background:var(--surface-2);border:1.5px solid var(--border);box-shadow:var(--shadow-sm)">
+          <!-- RECENT ACTIVITY -->
+          <div class="xl:col-span-2 rounded-3xl p-6 animate-fade-up"
+            style="background:#fff;border:1.5px solid var(--border);box-shadow:var(--shadow-sm)">
 
-            <div class="flex items-center gap-2.5 mb-5">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                style="background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.2)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:#6366f1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <div class="flex items-center gap-3 mb-6">
+
+              <div class="w-10 h-10 rounded-2xl flex items-center justify-center"
+                style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.15)">
+
+                <lucide-icon [img]="Clock3"
+                  class="w-5 h-5 text-amber-600">
+                </lucide-icon>
+
               </div>
-              <h2 class="font-bold text-sm" style="color:var(--text-1)">Actividad reciente</h2>
+
+              <div>
+
+                <h2 class="text-sm font-bold"
+                  style="color:var(--text-1)">
+
+                  Actividad reciente
+
+                </h2>
+
+                <p class="text-xs"
+                  style="color:var(--text-4)">
+
+                  Últimos movimientos registrados
+
+                </p>
+
+              </div>
+
             </div>
 
-            @if (stats()!.recent_transactions.length === 0) {
-              <p class="text-sm text-center py-8" style="color:var(--text-3)">Sin transacciones aún</p>
+            @if (!stats()!.recent_transactions.length) {
+
+              <p class="text-sm text-center py-10"
+                style="color:var(--text-4)">
+
+                Sin transacciones aún
+
+              </p>
+
+            } @else {
+
+              <div class="space-y-3">
+
+                @for (tx of stats()!.recent_transactions; track tx.id) {
+
+                  <div
+                    class="p-4 rounded-2xl transition-all duration-200"
+                    style="background:var(--surface-2);border:1px solid var(--border)">
+
+                    <div class="flex items-center justify-between">
+
+                      <div class="flex items-center gap-3">
+
+                        <div
+                          class="w-10 h-10 rounded-xl flex items-center justify-center"
+                          [style]="tx.transaction_type === 'sale'
+                            ? 'background:rgba(16,185,129,.1)'
+                            : 'background:rgba(99,102,241,.1)'">
+
+                          @if (tx.transaction_type === 'sale') {
+
+                            <lucide-icon [img]="ArrowUpRight"
+                              class="w-4 h-4 text-emerald-600">
+                            </lucide-icon>
+
+                          } @else {
+
+                            <lucide-icon [img]="ArrowDownRight"
+                              class="w-4 h-4 text-indigo-500">
+                            </lucide-icon>
+
+                          }
+
+                        </div>
+
+                        <div>
+
+                          <p class="text-sm font-bold"
+                            style="color:var(--text-1)">
+
+                            #{{ tx.id }} · {{ tx.transaction_type === 'sale' ? 'Venta' : 'Compra' }}
+
+                          </p>
+
+                          <p class="text-xs"
+                            style="color:var(--text-4)">
+
+                            {{ tx.created_at | date:'d MMM, h:mm a' }}
+
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                      <span
+                        class="text-sm font-black"
+                        [style]="tx.transaction_type === 'sale'
+                          ? 'color:#059669'
+                          : 'color:#6366f1'">
+
+                        {{ cop(tx.total) }}
+
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                }
+
+              </div>
+
             }
 
-            <div class="space-y-2">
-              @for (tx of stats()!.recent_transactions; track tx.id) {
-                <div class="flex items-center justify-between p-3 rounded-xl transition-all"
-                  style="background:var(--surface-3);border:1px solid transparent"
-                  onmouseenter="this.style.borderColor='var(--border-accent)'"
-                  onmouseleave="this.style.borderColor='transparent'">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                      [style]="tx.transaction_type === 'sale'
-                        ? 'background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2)'
-                        : 'background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2)'">
-                      @if (tx.transaction_type === 'sale') {
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" style="color:#059669" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-                      } @else {
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" style="color:#6366f1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-                      }
-                    </div>
-                    <div>
-                      <p class="text-xs font-semibold" style="color:var(--text-1)">#{{ tx.id }} · {{ tx.transaction_type === 'sale' ? 'Venta' : 'Compra' }}</p>
-                      <p class="text-xs mt-0.5" style="color:var(--text-3)">{{ tx.created_at | date:'d MMM, h:mm a' }}</p>
-                    </div>
-                  </div>
-                  <span class="text-sm font-black stat-number"
-                    [style]="tx.transaction_type === 'sale' ? 'color:#059669' : 'color:#6366f1'">
-                    {{ tx.total | currency:'COP':'symbol-narrow':'1.0-0' }}
-                  </span>
-                </div>
-              }
-            </div>
           </div>
+
         </div>
+
       }
+
     </div>
-  `,
+  `
 })
 export class DashboardComponent implements OnInit {
-  private dashService = inject(DashboardService);
+
+  Truck = Truck;
+  Package = Package;
+  ReceiptText = ReceiptText;
+  DollarSign = DollarSign;
+  TrendingUp = TrendingUp;
+  TrendingDown = TrendingDown;
+  Activity = Activity;
+  ShoppingCart = ShoppingCart;
+  ArrowUpRight = ArrowUpRight;
+  ArrowDownRight = ArrowDownRight;
+  Clock3 = Clock3;
+
+  private ds = inject(DashboardService);
+
   stats = signal<DashboardStats | null>(null);
   loading = signal(true);
 
   ngOnInit() {
-    this.dashService.getStats().subscribe({
-      next: (data) => { this.stats.set(data); this.loading.set(false); },
-      error: () => this.loading.set(false),
+    this.ds.getStats().subscribe({
+      next: (d) => {
+        this.stats.set(d);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false)
     });
+  }
+
+  cop(n: number) {
+    return COP(n);
   }
 
   statCards() {
     const s = this.stats()!;
+
     return [
       {
-        label: 'Proveedores', value: s.total_suppliers,
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
-        iconBg: 'rgba(99,102,241,0.10)', iconColor: '#6366f1', glow: 'rgba(99,102,241,0.06)',
+        label: 'Proveedores',
+        value: s.total_suppliers,
+        icon: 'truck',
+        color: '#6366f1',
+        bg: 'rgba(99,102,241,.08)',
+        glow: 'radial-gradient(circle at top, rgba(99,102,241,.12), transparent 70%)'
       },
       {
-        label: 'Productos', value: s.total_foods,
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
-        iconBg: 'rgba(251,146,60,0.10)', iconColor: '#ea580c', glow: 'rgba(251,146,60,0.06)',
+        label: 'Productos',
+        value: s.total_foods,
+        icon: 'package',
+        color: '#f97316',
+        bg: 'rgba(249,115,22,.08)',
+        glow: 'radial-gradient(circle at top, rgba(249,115,22,.12), transparent 70%)'
       },
       {
-        label: 'Transacciones', value: s.total_transactions,
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
-        iconBg: 'rgba(16,185,129,0.10)', iconColor: '#059669', glow: 'rgba(16,185,129,0.06)',
+        label: 'Transacciones',
+        value: s.total_transactions,
+        icon: 'receipt',
+        color: '#10b981',
+        bg: 'rgba(16,185,129,.08)',
+        glow: 'radial-gradient(circle at top, rgba(16,185,129,.12), transparent 70%)'
       },
       {
-        label: 'Ingresos totales',
-        value: new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(s.total_revenue),
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`,
-        iconBg: 'rgba(234,179,8,0.10)', iconColor: '#ca8a04', glow: 'rgba(234,179,8,0.06)',
-      },
+        label: 'Ganancia Neta',
+        value: COP(s.total_profit),
+        icon: 'dollar',
+        color: s.total_profit >= 0 ? '#059669' : '#e11d48',
+        bg: s.total_profit >= 0
+          ? 'rgba(16,185,129,.08)'
+          : 'rgba(244,63,94,.08)',
+        glow: s.total_profit >= 0
+          ? 'radial-gradient(circle at top, rgba(16,185,129,.12), transparent 70%)'
+          : 'radial-gradient(circle at top, rgba(244,63,94,.12), transparent 70%)'
+      }
     ];
   }
 
-  barWidth(count: number): number {
-    const max = Math.max(...(this.stats()?.food_stats.map((f) => f.count) ?? [1]), 1);
+  barWidth(count: number) {
+    const max = Math.max(
+      ...(this.stats()?.food_stats.map(f => f.count) ?? [1]),
+      1
+    );
+
     return (count / max) * 100;
   }
 }

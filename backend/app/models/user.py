@@ -14,5 +14,4 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # Relationship: user can appear as customer in transactions
     transactions = relationship("Transaction", back_populates="customer", foreign_keys="Transaction.customer_id")

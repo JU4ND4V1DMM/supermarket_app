@@ -9,6 +9,23 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./modules/auth/auth.routes').then((m) => m.authRoutes),
   },
+  // Ruta pública: detalle de transacción sin requerir login
+  {
+    path: 'transactions/:id',
+    loadComponent: () =>
+      import('./layouts/public-layout/public-layout.component').then(
+        (m) => m.PublicLayoutComponent
+      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./modules/transactions/transaction-detail/transaction-detail.component').then(
+            (m) => m.TransactionDetailComponent
+          ),
+      },
+    ],
+  },
   {
     path: '',
     canActivate: [authGuard],

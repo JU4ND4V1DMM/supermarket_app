@@ -6,7 +6,8 @@ import { Supplier, PaginatedResponse } from './supplier.service';
 export interface Food {
   id: number;
   name: string;
-  price: number;
+  purchase_price: number;
+  sale_price: number;
   supplier_id: number;
   supplier?: Supplier;
   created_at: string;
@@ -18,30 +19,12 @@ export class FoodService {
   private base = `${environment.apiUrl}/foods`;
 
   getAll(page = 1, pageSize = 10, search = '') {
-    const params = new HttpParams()
-      .set('page', page)
-      .set('page_size', pageSize)
-      .set('search', search);
+    const params = new HttpParams().set('page', page).set('page_size', pageSize).set('search', search);
     return this.http.get<PaginatedResponse<Food>>(this.base, { params });
   }
-
-  getAllNoPagination() {
-    return this.http.get<Food[]>(`${this.base}/all`);
-  }
-
-  getOne(id: number) {
-    return this.http.get<Food>(`${this.base}/${id}`);
-  }
-
-  create(data: Partial<Food>) {
-    return this.http.post<Food>(this.base, data);
-  }
-
-  update(id: number, data: Partial<Food>) {
-    return this.http.put<Food>(`${this.base}/${id}`, data);
-  }
-
-  delete(id: number) {
-    return this.http.delete(`${this.base}/${id}`);
-  }
+  getAllNoPagination() { return this.http.get<Food[]>(`${this.base}/all`); }
+  getOne(id: number) { return this.http.get<Food>(`${this.base}/${id}`); }
+  create(data: Partial<Food>) { return this.http.post<Food>(this.base, data); }
+  update(id: number, data: Partial<Food>) { return this.http.put<Food>(`${this.base}/${id}`, data); }
+  delete(id: number) { return this.http.delete(`${this.base}/${id}`); }
 }

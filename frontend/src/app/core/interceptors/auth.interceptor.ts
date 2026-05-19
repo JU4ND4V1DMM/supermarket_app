@@ -4,6 +4,13 @@ import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
+
+  const isPublicDetailRoute = req.method === 'GET' && /\/transactions\/\d+$/.test(req.url);
+
+  if (isPublicDetailRoute) {
+    return next(req);
+  }
+
   const token = auth.getToken();
 
   if (token) {
