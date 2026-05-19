@@ -59,7 +59,7 @@ import { Router } from '@angular/router';
           </div>
 
           <div class="mb-8">
-            <h2 class="text-3xl font-extrabold text-white tracking-tight">Bienvenido de vuelta</h2>
+            <h2 class="text-3xl font-extrabold text-indigo-600 tracking-tight">Bienvenido de vuelta</h2>
             <p class="mt-2" style="color:var(--text-2)">Ingresa a tu cuenta para continuar</p>
           </div>
 
